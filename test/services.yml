@@ -1,0 +1,7 @@
+## YAML Template.
+---
+services:
+    app.get.integer:
+        class: GetIntegerService
+    app.get.string:
+        class: GetStringService
