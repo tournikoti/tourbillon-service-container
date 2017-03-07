@@ -12,10 +12,13 @@ use Exception;
  */
 class ServiceLocator
 {
+    private $parameters;
+    
     private $services;
 
-    public function __construct(array $services)
+    public function __construct(array $parameters, array $services)
     {
+        $this->parameters = $parameters;
         $this->services = $services;
     }
 
@@ -45,9 +48,14 @@ class ServiceLocator
                 if (0 === strpos($argument, '@')) {
                     $serviceName = substr($argument, 1);
                     if (!isset($this->services[$serviceName])) {
-                        throw new Exception("Parameters {$serviceName} does not exist");
+                        throw new Exception("Service {$serviceName} does not exist");
                     }
                     $arguments[] = $this->get($serviceName);
+                } else if (preg_match('/%([^%]*)%/', $argument, $matches)) {
+                    if (!array_key_exists($matches[1], $this->parameters)) {
+                        throw new Exception("Parameter {$matches[1]} does not exist");
+                    }
+                    $arguments[] = $this->parameters[$matches[1]];
                 } else {
                     $arguments[] = $argument;
                 }
