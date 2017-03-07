@@ -10,7 +10,7 @@ class RandomStringService
 
     public function __construct()
     {
-        
+
     }
 
 }

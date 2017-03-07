@@ -42,9 +42,15 @@ class ServiceLocator
         $arguments = array();
         if (isset($this->services[$name]['arguments'])) {
             foreach ($this->services[$name]['arguments'] as $argument) {
-                $arguments[] = isset($this->services[$argument])
-                    ? $this->get($argument)
-                    : $argument;
+                if (0 === strpos($argument, '@')) {
+                    $serviceName = substr($argument, 1);
+                    if (!isset($this->services[$serviceName])) {
+                        throw new Exception("Parameters {$serviceName} does not exist");
+                    }
+                    $arguments[] = $this->get($serviceName);
+                } else {
+                    $arguments[] = $argument;
+                }
             }
         }
 

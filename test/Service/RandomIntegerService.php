@@ -8,16 +8,18 @@
 class RandomIntegerService
 {
 
-    private $randomStringService;
+    private $service;
 
+    private $value;
 
-    public function __construct($randomStringService)
+    public function __construct(RandomStringService $service, $value)
     {
-        $this->randomStringService = $randomStringService;
+        $this->service = $service;
+        $this->value = $value;
     }
 
     public function getRandomStringService()
     {
-        return $this->randomStringService;
+        return $this->service;
     }
 }
