@@ -16,9 +16,7 @@ class ServiceLocator
 
     public function __construct(array $services)
     {
-        if (is_array($services)) {
-            $this->services = $services;
-        }
+        $this->services = $services;
     }
 
     public function get($name)
@@ -33,7 +31,12 @@ class ServiceLocator
 
         return $this->services[$name];
     }
-    
+
+    public function add(array $services)
+    {
+        $this->services = array_merge($this->services, $services);
+    }
+
     private function createInstance($name)
     {
         $arguments = array();

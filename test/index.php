@@ -7,7 +7,22 @@ require './Service/RandomStringService.php';
 
 use Tourbillon\ServiceContainer\ServiceLocator;
 
-$services = array(
+$mainServices = array(
+    'request' => array(
+        'class' => 'RandomIntegerService',
+        'arguments' => [
+            'app.random.string'
+        ]
+    ),
+    'app.random.string' => array(
+        'class' => 'RandomStringService',
+        'arguments' => [
+            '10'
+        ]
+    )
+);
+
+$secondServices = array(
     'app.random.integer' => array(
         'class' => 'RandomIntegerService',
         'arguments' => [
@@ -22,7 +37,8 @@ $services = array(
     )
 );
 
-$serviceLocator = new ServiceLocator($services);
+$serviceLocator = new ServiceLocator($mainServices);
 
+$serviceLocator->add($secondServices);
 
 var_dump($serviceLocator->get('app.random.integer')->getRandomStringService());
