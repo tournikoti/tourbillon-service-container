@@ -6,12 +6,12 @@ require './Service/RandomIntegerService.php';
 require './Service/RandomStringService.php';
 require './Service/RandomIntegerServiceFactory.php';
 
+use Tourbillon\Configurator\ConfiguratorFactory;
 use Tourbillon\ServiceContainer\ServiceLocator;
 
-$parameters = array(
-    'var1' => 'test 1',
-    'var2' => 'test 2',
-);
+$configurator = ConfiguratorFactory::createInstance('config/config.neon');
+
+var_dump($configurator);
 
 $mainServices = array(
     'app.service.factory' => [
@@ -25,13 +25,14 @@ $mainServices = array(
     ],
     'app.random.string' => [
         'class' => 'RandomStringService',
-        'arguments' => ['10']
+        'arguments' => ['10'],
+        'config' => 'random'
     ]
 );
 
-$serviceLocator = new ServiceLocator($parameters, $mainServices);
+$serviceLocator = new ServiceLocator($configurator, $mainServices);
 
-$service1 = $serviceLocator->get('app.random.integer');
+$service1 = $serviceLocator->get('app.random.string');
 $service2 = $serviceLocator->get('app.random.integer');
 
-var_dump($service); exit;
+var_dump($service1, $service2); exit;

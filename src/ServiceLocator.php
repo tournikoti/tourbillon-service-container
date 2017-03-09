@@ -2,8 +2,9 @@
 
 namespace Tourbillon\ServiceContainer;
 
-use ReflectionClass;
 use Exception;
+use ReflectionClass;
+use Tourbillon\Configurator\Configurator;
 
 /**
  * Description of ServiceContainer
@@ -12,12 +13,16 @@ use Exception;
  */
 class ServiceLocator
 {
-    private $parameters;
+    /**
+     *
+     * @var Configurator
+     */
+    private $configurator;
     private $services;
 
-    public function __construct(array $parameters, array $services)
+    public function __construct(Configurator $configurator, array $services)
     {
-        $this->parameters = $parameters;
+        $this->configurator = $configurator;
         $this->services   = $services;
     }
 
@@ -55,7 +60,13 @@ class ServiceLocator
     private function createInstance($name)
     {
         $reflection = new ReflectionClass($this->services[$name]['class']);
-        return $reflection->newInstanceArgs($this->getArguments($name));
+        $instance = $reflection->newInstanceArgs($this->getArguments($name));
+
+        if ($instance instanceof ConfigurableServiceInterface) {
+            $instance->configuration($this->configurator);
+        }
+
+        return $instance;
     }
 
     private function createInstanceByFactory($name)
@@ -93,10 +104,10 @@ class ServiceLocator
             }
             return $this->get($serviceName);
         } else if (preg_match('/%([^%]*)%/', $argument, $matches)) {
-            if (!array_key_exists($matches[1], $this->parameters)) {
+            if (!array_key_exists($matches[1], $this->configurator->getParameters())) {
                 throw new Exception("Parameter {$matches[1]} does not exist");
             }
-            return $this->parameters[$matches[1]];
+            return $this->configurator->getParameter($matches[1]);
         }
         return $argument;
     }
