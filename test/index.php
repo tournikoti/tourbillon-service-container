@@ -4,6 +4,7 @@ require '../vendor/autoload.php';
 
 require './Service/RandomIntegerService.php';
 require './Service/RandomStringService.php';
+require './Service/RandomIntegerServiceFactory.php';
 
 use Tourbillon\ServiceContainer\ServiceLocator;
 
@@ -13,30 +14,24 @@ $parameters = array(
 );
 
 $mainServices = array(
-    'request' => array(
+    'app.service.factory' => [
+        'class' => 'RandomIntegerServiceFactory',
+        'arguments' => ['@app.random.string', 10]
+    ],
+    'app.random.integer' => [
         'class' => 'RandomIntegerService',
-        'arguments' => ['@app.random.string']
-    ),
-    'app.random.string' => array(
+        'arguments' => ['@app.random.string', 10],
+        'factory' => ['@app.service.factory', 'createInstance'],
+    ],
+    'app.random.string' => [
         'class' => 'RandomStringService',
         'arguments' => ['10']
-    )
-);
-
-$secondServices = array(
-    'app.random.integer' => array(
-        'class' => 'RandomIntegerService',
-        'arguments' => ['@app.random.string', '%var1%', 'boom']
-    ),
-    'app.random.string' => array(
-        'class' => 'RandomStringService',
-        'arguments' => ['10']
-    )
+    ]
 );
 
 $serviceLocator = new ServiceLocator($parameters, $mainServices);
 
-$serviceLocator->add($secondServices);
+$service1 = $serviceLocator->get('app.random.integer');
+$service2 = $serviceLocator->get('app.random.integer');
 
-var_dump($serviceLocator->get('app.random.integer'));
-var_dump($serviceLocator->get('app.random.integer')->getRandomStringService());
+var_dump($service); exit;
