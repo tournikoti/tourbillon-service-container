@@ -35,9 +35,18 @@ class ServiceLocator
         return $this->services[$name];
     }
 
-    public function add(array $services)
+    public function addServices(array $services)
     {
         $this->services = array_merge($this->services, $services);
+    }
+
+    public function addService($name, $service)
+    {
+        if (array_key_exists($name, $this->services)) {
+            throw new Exception("A service {$name} already exist");
+        }
+
+        $this->services[$name] = $service;
     }
 
     private function createInstance($name)
