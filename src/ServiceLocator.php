@@ -97,18 +97,21 @@ class ServiceLocator
 
     private function getArgument($argument)
     {
-        if (0 === strpos($argument, '@')) {
-            $serviceName = substr($argument, 1);
-            if (!isset($this->services[$serviceName])) {
-                throw new Exception("Service {$serviceName} does not exist");
+        if (!is_array($argument)) {
+            if (0 === strpos($argument, '@')) {
+                $serviceName = substr($argument, 1);
+                if (!isset($this->services[$serviceName])) {
+                    throw new Exception("Service {$serviceName} does not exist");
+                }
+                return $this->get($serviceName);
+            } else if (preg_match('/%([^%]*)%/', $argument, $matches)) {
+                if (!array_key_exists($matches[1], $this->configurator->getParameters())) {
+                    throw new Exception("Parameter {$matches[1]} does not exist");
+                }
+                return $this->configurator->getParameter($matches[1]);
             }
-            return $this->get($serviceName);
-        } else if (preg_match('/%([^%]*)%/', $argument, $matches)) {
-            if (!array_key_exists($matches[1], $this->configurator->getParameters())) {
-                throw new Exception("Parameter {$matches[1]} does not exist");
-            }
-            return $this->configurator->getParameter($matches[1]);
         }
+
         return $argument;
     }
 
